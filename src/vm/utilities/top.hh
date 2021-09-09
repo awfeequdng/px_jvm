@@ -5,3 +5,4 @@
 
 #include "oops/oopsHierarchy.hh"
 #include "utilities/globalDefinitions.hh"
+#include "symbol.hh"

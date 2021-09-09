@@ -7,6 +7,8 @@ include_directories(src/vm)
 include_directories(src/vm/oops)
 include_directories(src/vm/utilities)
 include_directories(src/vm/interpreter)
+include_directories(src/vm/classfile)
+include_directories(src/vm/adlc)
 
 file(GLOB_RECURSE SOURCE_FILES
         ${PROJECT_SOURCE_DIR}/src/*/*.cc
