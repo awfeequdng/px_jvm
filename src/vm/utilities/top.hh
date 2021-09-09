@@ -3,6 +3,6 @@
 //
 #pragma once
 
-#include "oops/oopsHierarchy.hh"
-#include "utilities/globalDefinitions.hh"
+#include "oopsHierarchy.hh"
+#include "globalDefinitions.hh"
 #include "symbol.hh"
