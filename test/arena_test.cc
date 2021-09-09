@@ -14,10 +14,16 @@ protected:
 };
 
 TEST_F(TestArena, test1) {
-    auto ptr = _arena.Amalloc(16);
+    auto ptr1 = _arena.Amalloc(16);
     EXPECT_EQ(_arena.used(), 16);
-    ptr = _arena.Amalloc(7);
+    auto ptr2 = _arena.Amalloc(7);
     EXPECT_EQ(_arena.used(), 24);
+    _arena.Afree(ptr1, 8);
+    EXPECT_EQ(_arena.used(), 24);
+    _arena.Afree(ptr2, 8);
+    EXPECT_EQ(_arena.used(), 16);
+    _arena.Afree(ptr1, 16);
+    EXPECT_EQ(_arena.used(), 0);
 }
 
 int main(int argc, char **argv) {
