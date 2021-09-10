@@ -262,6 +262,36 @@ public:
         number_of_codes
     };
 
+
+    // Flag bits derived from format strings, can_trap, can_rewrite, etc.:
+    enum Flags {
+        // semantic flags:
+        _bc_can_trap      = 1<<0,     // bytecode execution can trap or block
+        _bc_can_rewrite   = 1<<1,     // bytecode execution has an alternate form
+
+        // format bits (determined only by the format string):
+        _fmt_has_c        = 1<<2,     // constant, such as sipush "bcc"
+        _fmt_has_j        = 1<<3,     // constant pool cache index, such as getfield "bjj"
+        _fmt_has_k        = 1<<4,     // constant pool index, such as ldc "bk"
+        _fmt_has_i        = 1<<5,     // local index, such as iload
+        _fmt_has_o        = 1<<6,     // offset, such as ifeq
+        _fmt_has_nbo      = 1<<7,     // contains native-order field(s)
+        _fmt_has_u2       = 1<<8,     // contains double-byte field(s)
+        _fmt_has_u4       = 1<<9,     // contains quad-byte field
+        _fmt_not_variable = 1<<10,    // not of variable length (simple or wide)
+        _fmt_not_simple   = 1<<11,    // either wide or variable length
+        _all_fmt_bits     = (_fmt_not_simple*2 - _fmt_has_c),
+
+        // Example derived format syndromes:
+        _fmt_b      = _fmt_not_variable,
+        _fmt_bc     = _fmt_b | _fmt_has_c,
+        _fmt_bi     = _fmt_b | _fmt_has_i,
+        _fmt_bkk    = _fmt_b | _fmt_has_k | _fmt_has_u2,
+        _fmt_bJJ    = _fmt_b | _fmt_has_j | _fmt_has_u2 | _fmt_has_nbo,
+        _fmt_bo2    = _fmt_b | _fmt_has_o | _fmt_has_u2,
+        _fmt_bo4    = _fmt_b | _fmt_has_o | _fmt_has_u4
+    };
+
 private:
     static bool        _is_initialized;
     static const char* _name          [number_of_codes];
@@ -271,10 +301,32 @@ private:
     static Code        _java_code     [number_of_codes];
     static jchar       _flags         [(1<<BitsPerByte)*2]; // all second page for wide formats
 
-    static void        pd_initialize();              // platform specific initialization
+    static void        def(Code code, const char* name, const char* format, const char* wide_format, BasicType result_type, int depth, bool can_trap);
+    static void        def(Code code, const char* name, const char* format, const char* wide_format, BasicType result_type, int depth, bool can_trap, Code java_code);
+
 
 public:
+    // Conversion
+    static void        check          (Code code);
+    static void        wide_check     (Code code);
+    static Code        cast           (int  code)    { return (Code)code; }
 
+    // Bytecode attributes
+    static bool        is_defined     (int  code)    { return 0 <= code && code < number_of_codes && flags(code, false) != 0; }
+    static bool        wide_is_defined(int  code)    { return is_defined(code) && flags(code, true) != 0; }
+    static const char* name           (Code code)    { check(code);      return _name          [code]; }
+    static BasicType   result_type    (Code code)    { check(code);      return _result_type   [code]; }
+    static int         depth          (Code code)    { check(code);      return _depth         [code]; }
+    // Note: Length functions must return <=0 for invalid bytecodes.
+    // Calling check(code) in length functions would throw an unwanted assert.
+    static int         length_for     (Code code)    { /*no check*/      return _lengths       [code] & 0xF; }
+    static int         wide_length_for(Code code)    { /*no check*/      return _lengths       [code] >> 4; }
+
+    static int         compute_flags  (const char* format, int more_flags = 0);  // compute the flags
+    static int         flags          (int code, bool is_wide) {
+        assertm(code == (u_char)code, "must be a byte");
+        return _flags[code + (is_wide ? (1<<BitsPerByte) : 0)];
+    }
     // Initialization
     static void        initialize     ();
 };

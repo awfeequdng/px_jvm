@@ -13,8 +13,11 @@ class _jclass : public _jobject {};
 typedef _jobject *jobject;
 typedef _jclass *jclass;
 
-typedef   signed char s_char;
-typedef unsigned char u_char;
+typedef signed char     s_char;
+typedef unsigned char   u_char;
+typedef signed short    s_short;
+typedef unsigned short  u_short;
+
 typedef u_char*       address;
 
 typedef unsigned char       jboolean;
@@ -111,6 +114,18 @@ const int NANOUNITS     = 1000000000;   // nano units per base unit
 const jlong NANOSECS_PER_SEC      = CONST64(1000000000);
 const jint  NANOSECS_PER_MILLISEC = 1000000;
 
+class HeapWord {
+private:
+    char* i;
+public:
+    char* value() { return i; }
+};
+
+// HeapWordSize must be 2^LogHeapWordSize.
+const int HeapWordSize        = sizeof(HeapWord);
+const int HeapWordsPerLong    = BytesPerLong / HeapWordSize;
+const int LogHeapWordSize     = 3;
+const int LogHeapWordsPerLong = LogBytesPerLong - LogHeapWordSize;
 
 inline const char* proper_unit_for_byte_size(size_t s) {
     if (s >= 10*G) {
@@ -429,4 +444,32 @@ inline int extract_high_short_from_int(jint x) {
 
 inline int build_int_from_shorts( jushort low, jushort high ) {
     return ((int)((unsigned int)high << 16) | (unsigned int)low);
+}
+
+// Signed variants of alignment helpers.  There are two versions of each, a macro
+// for use in places like enum definitions that require compile-time constant
+// expressions and a function for all other places so as to get type checking.
+//类似round_to，但是不要求alignment是2的倍数
+#define align_size_up_(size, alignment) (((size) + ((alignment) - 1)) & ~((alignment) - 1))
+
+inline bool is_size_aligned(size_t size, size_t alignment) {
+    return align_size_up_(size, alignment) == size;
+}
+
+inline intptr_t align_size_up(intptr_t size, intptr_t alignment) {
+    return align_size_up_(size, alignment);
+}
+
+#define align_size_down_(size, alignment) ((size) & ~((alignment) - 1))
+
+inline intptr_t align_size_down(intptr_t size, intptr_t alignment) {
+    return align_size_down_(size, alignment);
+}
+
+#define is_size_aligned_(size, alignment) ((size) == (align_size_up_(size, alignment)))
+
+
+// Pad out certain offsets to jlong alignment, in HeapWord units.
+inline intptr_t align_object_offset(intptr_t offset) {
+    return align_size_up(offset, HeapWordsPerLong);
 }

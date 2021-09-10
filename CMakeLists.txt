@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 # CTest
 enable_testing()
 
+find_library(fmt ext/fmt)
 
 # Includes.
 set(PX_JVM_SRC_INCLUDE_DIR 
@@ -14,6 +15,7 @@ set(PX_JVM_SRC_INCLUDE_DIR
     ${PROJECT_SOURCE_DIR}/src/vm/interpreter
     ${PROJECT_SOURCE_DIR}/src/vm/adlc
     ${PROJECT_SOURCE_DIR}/src/vm/classfile
+    ${PROJECT_SOURCE_DIR}/src/vm/memory
     )
 set(PX_JVM_TEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/tests/include)
 set(PX_JVM_THIRD_PARTY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/ext/gtest/googletest ${PROJECT_SOURCE_DIR}/ext/fmt/include)
