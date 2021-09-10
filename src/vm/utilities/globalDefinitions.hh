@@ -473,3 +473,17 @@ inline intptr_t align_size_down(intptr_t size, intptr_t alignment) {
 inline intptr_t align_object_offset(intptr_t offset) {
     return align_size_up(offset, HeapWordsPerLong);
 }
+
+
+const int oopSize            = sizeof(char*); // Full-width oop
+const int wordSize           = sizeof(char*);
+
+const int BytesPerOop        = BytesPerWord;  // Full-width oop
+
+extern int heapOopSize;
+extern int LogBytesPerHeapOop;                // Oop within a java object
+extern int LogBitsPerHeapOop;
+extern int BytesPerHeapOop;
+extern int BitsPerHeapOop;
+
+void basic_types_init();

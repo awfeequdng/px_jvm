@@ -16,6 +16,7 @@ set(PX_JVM_SRC_INCLUDE_DIR
     ${PROJECT_SOURCE_DIR}/src/vm/adlc
     ${PROJECT_SOURCE_DIR}/src/vm/classfile
     ${PROJECT_SOURCE_DIR}/src/vm/memory
+    ${PROJECT_SOURCE_DIR}/src/vm/runtime
     )
 set(PX_JVM_TEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/tests/include)
 set(PX_JVM_THIRD_PARTY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/ext/gtest/googletest ${PROJECT_SOURCE_DIR}/ext/fmt/include)
